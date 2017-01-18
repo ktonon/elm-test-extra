@@ -1,0 +1,17 @@
+{
+    "version": "1.0.0",
+    "summary": "Write concise tests for JSON decoders",
+    "repository": "https://github.com/ktonon/elm-test-extra.git",
+    "license": "MIT",
+    "source-directories": [
+        "src"
+    ],
+    "exposed-modules": [
+      "Test.Extra"
+    ],
+    "dependencies": {
+        "elm-community/elm-test": "3.0.0 <= v < 4.0.0",
+        "elm-lang/core": "5.0.0 <= v < 6.0.0"
+  },
+    "elm-version": "0.18.0 <= v < 0.19.0"
+}
