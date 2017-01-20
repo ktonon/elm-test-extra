@@ -1,14 +1,34 @@
-module Fuzz.Extra exposing (union)
+module Fuzz.Extra exposing (eitherOr, union)
 
 {-| Extends [Fuzz](http://package.elm-lang.org/packages/elm-community/elm-test/latest/Fuzz) with more `Fuzzer`s
 
-@docs union
+@docs eitherOr, union
 -}
 
 import Array
-import Fuzz exposing (Fuzzer, map)
+import Fuzz exposing (Fuzzer, map, andThen)
 import Random.Pcg as Random
 import Shrink exposing (Shrinker)
+
+
+{-| Combine two fuzzers.
+
+    fuzzMaybeInt : Fuzzer (Maybe Int)
+    fuzzMaybeInt =
+        Fuzz.Extra.eitherOr
+            (Fuzz.constant Nothing)
+            (Fuzz.int |> Fuzz.map Just)
+-}
+eitherOr : Fuzzer a -> Fuzzer a -> Fuzzer a
+eitherOr a b =
+    Fuzz.bool
+        |> andThen
+            (\x ->
+                if x then
+                    a
+                else
+                    b
+            )
 
 
 {-| Create a fuzzer for a union type.
