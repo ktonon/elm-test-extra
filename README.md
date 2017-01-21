@@ -1,6 +1,8 @@
 elm-test-extra
 ==============
 
+[![CircleCI](https://circleci.com/gh/ktonon/elm-test-extra.svg?style=svg)](https://circleci.com/gh/ktonon/elm-test-extra)
+
 Extra expectations, fuzzers, testers and describers.
 
 `elm package install` [ktonon/elm-test-extra][]
