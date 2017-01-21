@@ -1,14 +1,21 @@
-module Fuzz.Extra exposing (eitherOr, union)
+module Fuzz.Extra exposing (eitherOr, uniformOrCrash, stringMaxLength, union)
 
-{-| Extends [Fuzz](http://package.elm-lang.org/packages/elm-community/elm-test/latest/Fuzz) with more `Fuzzer`s
+{-| Extends `Fuzz` with more `Fuzzer`s.
 
-@docs eitherOr, union
+@docs eitherOr, uniformOrCrash, stringMaxLength
+
+## Deprecated
+
+Do not use this. It will be deprecated in version 2.
+
+@docs union
 -}
 
 import Array
-import Fuzz exposing (Fuzzer, map, andThen)
-import Random.Pcg as Random
+import Fuzz exposing (Fuzzer, andThen, map)
+import Random.Pcg as Random exposing (Generator)
 import Shrink exposing (Shrinker)
+import Util exposing (..)
 
 
 {-| Combine two fuzzers.
@@ -31,30 +38,41 @@ eitherOr a b =
             )
 
 
+{-| Generates among the provided values with uniform distribution
+
+Like `Fuzz.frequencyOrCrash` but with uniform distribution.
+
+    httpMethod : Fuzzer Method
+    httpMethod =
+        [ GET, POST, PUT, DELETE, OPTIONS ]
+            |> List.map Fuzz.constant
+            |> uniformOrCrash
+
+Same as for `frequencyOrCrash`: "This is useful in tests, where a crash will
+simply cause the test run to fail. There is no danger to a production system
+there."
+-}
+uniformOrCrash : List (Fuzzer a) -> Fuzzer a
+uniformOrCrash list =
+    list
+        |> List.map (\x -> ( 1.0, x ))
+        |> Fuzz.frequencyOrCrash
+
+
+{-| Generates random printable ASCII with a maximum length.
+-}
+stringMaxLength : Int -> Fuzzer String
+stringMaxLength high =
+    Fuzz.custom
+        (Random.int 0 high
+            |> Random.andThen (lengthString charGenerator)
+        )
+        Shrink.string
+
+
 {-| Create a fuzzer for a union type.
 
-    type Age
-        = Baby
-        | Teen
-        | Adult
-
-
-    shrinkAge : Shrinker Age
-    shrinkAge a =
-        case a of
-            Baby ->
-                Teen ::: Adult ::: empty
-
-            Teen ->
-                Adult ::: empty
-
-            Adult ->
-                empty
-
-
-    fuzzAge : Fuzzer Age
-    fuzzAge =
-        Fuzz.Extra.union [ Baby, Teen, Adult ] Baby shrinkAge
+__Deprecated__: use `uniformOrCrash`
 -}
 union : List a -> a -> Shrinker a -> Fuzzer a
 union list default shrinker =

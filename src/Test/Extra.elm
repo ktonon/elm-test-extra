@@ -1,6 +1,10 @@
 module Test.Extra exposing (DecoderExpectation(..), describeDecoder, testDecoder)
 
-{-| Write concise test for JSON decoders
+{-| Extends `Test` with specialized test and describe function.
+
+## Describing JSON Decoders
+
+Write concise test for JSON decoders
 
 @docs DecoderExpectation, describeDecoder, testDecoder
 -}

@@ -1,11 +1,13 @@
 elm-test-extra
 ==============
 
-Write concise test for JSON decoders.
+Extra expectations, fuzzers, testers and describers.
 
 `elm package install` [ktonon/elm-test-extra][]
 
-## Usage
+## Example: Describing JSON Decoders
+
+Write concise test for JSON decoders.
 
 Use the high level `describeDecoder` to quickly write tests that exercise a `Json.Decode.Decoder`. For example,
 

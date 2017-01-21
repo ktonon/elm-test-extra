@@ -1,6 +1,6 @@
 module Expect.Extra exposing (contain, member)
 
-{-| Extends Expect library with more `Expectation`s.
+{-| Extends `Expect` with more `Expectation`s.
 
 @docs contain, member
 -}
