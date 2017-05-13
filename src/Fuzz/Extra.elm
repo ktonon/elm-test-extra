@@ -1,8 +1,8 @@
-module Fuzz.Extra exposing (eitherOr, uniformOrCrash, stringMaxLength, union)
+module Fuzz.Extra exposing (eitherOr, uniformOrCrash, stringMaxLength, union, sequence)
 
 {-| Extends `Fuzz` with more `Fuzzer`s.
 
-@docs eitherOr, uniformOrCrash, stringMaxLength
+@docs eitherOr, uniformOrCrash, stringMaxLength, sequence
 
 ## Deprecated
 
@@ -68,6 +68,20 @@ stringMaxLength high =
             |> Random.andThen (lengthString charGenerator)
         )
         Shrink.string
+
+
+{-| Sequence a list of fuzzers into a fuzzer of a list.
+-}
+sequence : List (Fuzzer a) -> Fuzzer (List a)
+sequence fuzzers =
+    List.foldl
+        (\fuzzer listFuzzer ->
+            Fuzz.constant (::)
+                |> Fuzz.andMap fuzzer
+                |> Fuzz.andMap listFuzzer
+        )
+        (Fuzz.constant [])
+        fuzzers
 
 
 {-| Create a fuzzer for a union type.
