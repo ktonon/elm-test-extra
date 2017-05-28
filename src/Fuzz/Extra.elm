@@ -56,7 +56,7 @@ uniformOrCrash : List (Fuzzer a) -> Fuzzer a
 uniformOrCrash list =
     list
         |> List.map (\x -> ( 1.0, x ))
-        |> Fuzz.frequencyOrCrash
+        |> Fuzz.frequency
 
 
 {-| Generates random printable ASCII with a maximum length.

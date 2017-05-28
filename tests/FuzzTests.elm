@@ -1,6 +1,5 @@
 module FuzzTests exposing (all)
 
-import ElmTestBDDStyle exposing (..)
 import Expect exposing (..)
 import Expect.Extra exposing (..)
 import Fuzz exposing (Fuzzer, constant)
@@ -16,12 +15,12 @@ all =
         [ describe "stringMaxLength"
             [ fuzz (Fuzz.Extra.stringMaxLength 10) "fuzzes strings with appropriate length" <|
                 \w ->
-                    expect (w |> String.length) toBe lessThan 11
+                    Expect.lessThan 11 (w |> String.length)
             ]
         , describe "union"
             [ fuzz fuzzAge "fuzzes a union type" <|
                 \age ->
-                    expect [ Baby, Teen, Adult ] to contain age
+                    Expect.Extra.member age [ Baby, Teen, Adult ]
             ]
         ]
 
