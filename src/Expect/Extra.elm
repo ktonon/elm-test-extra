@@ -1,11 +1,68 @@
-module Expect.Extra exposing (contain, member)
+module Expect.Extra
+    exposing
+        ( MatchPattern
+        , contain
+        , match
+        , member
+        , regexPattern
+        , stringPattern
+        )
 
 {-| Extends `Expect` with more `Expectation`s.
+
+## Strings
+
+@docs match, MatchPattern, stringPattern, regexPattern
+
+## Lists
 
 @docs contain, member
 -}
 
 import Expect exposing (..)
+import Regex exposing (Regex)
+
+
+{-| An expectation represented as a pattern to match a string.
+-}
+type MatchPattern
+    = StringPattern String
+    | RegexPattern String
+
+
+{-| Matches if the pattern is contained within the actual string value.
+-}
+stringPattern : String -> MatchPattern
+stringPattern =
+    StringPattern
+
+
+{-| Matches if the regular expression matches the actual string value.
+-}
+regexPattern : String -> MatchPattern
+regexPattern =
+    RegexPattern
+
+
+{-| Passes if the given pattern matches the actual string.
+
+    -- Match with regular expressions
+    match (regexPattern "^[0-9a-f]+$") "deadbeef"
+
+    -- Or just plain strings
+    match (stringPattern "foo") "foo bar"
+
+-}
+match : MatchPattern -> String -> Expectation
+match expected actual =
+    case expected of
+        StringPattern pattern ->
+            Expect.true ("\"" ++ actual ++ "\" to contain sub-string: " ++ pattern) <|
+                String.contains pattern actual
+
+        RegexPattern pattern ->
+            Expect.true ("\"" ++ actual ++ "\" to match regex: " ++ pattern) <|
+                Regex.contains (Regex.regex pattern) actual
 
 
 {-| Passes if value is a member of list.
