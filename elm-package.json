@@ -1,5 +1,5 @@
 {
-    "version": "1.6.0",
+    "version": "1.6.1",
     "summary": "Extra expectations, fuzzers, testers and describers",
     "repository": "https://github.com/ktonon/elm-test-extra.git",
     "license": "MIT",
