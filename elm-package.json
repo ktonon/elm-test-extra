@@ -1,5 +1,5 @@
 {
-    "version": "1.6.1",
+    "version": "1.6.2",
     "summary": "Extra expectations, fuzzers, testers and describers",
     "repository": "https://github.com/ktonon/elm-test-extra.git",
     "license": "MIT",
@@ -12,8 +12,8 @@
         "Test.Extra"
     ],
     "dependencies": {
-        "elm-community/elm-test": "4.0.0 <= v < 5.0.0",
         "eeue56/elm-shrink": "1.0.0 <= v < 2.0.0",
+        "elm-community/elm-test": "4.0.0 <= v < 5.0.0",
         "elm-lang/core": "5.0.0 <= v < 6.0.0",
         "mgold/elm-random-pcg": "5.0.0 <= v < 6.0.0"
     },
