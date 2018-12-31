@@ -3,7 +3,7 @@
     "name": "ktonon/elm-test-extra",
     "summary": "Extra expectations, fuzzers, testers and describers",
     "license": "MIT",
-    "version": "1.6.3",
+    "version": "2.0.0",
     "exposed-modules": [
         "Expect.Extra",
         "Fuzz.Extra",

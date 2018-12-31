@@ -1,7 +1,7 @@
 elm-test-extra
 ==============
 
-[![elm-package](https://img.shields.io/badge/elm-1.6.3-blue.svg)](http://package.elm-lang.org/packages/ktonon/elm-test-extra/latest)
+[![elm-package](https://img.shields.io/badge/elm-2.0.0-blue.svg)](http://package.elm-lang.org/packages/ktonon/elm-test-extra/latest)
 [![CircleCI](https://img.shields.io/circleci/project/github/ktonon/elm-test-extra.svg)](https://circleci.com/gh/ktonon/elm-test-extra)
 
 Extra expectations, fuzzers, testers and describers.
