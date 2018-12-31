@@ -1,19 +1,24 @@
-module Fuzz.Extra exposing (eitherOr, uniformOrCrash, stringMaxLength, union, sequence)
+module Fuzz.Extra exposing
+    ( eitherOr, uniformOrCrash, stringMaxLength, sequence
+    , union
+    )
 
 {-| Extends `Fuzz` with more `Fuzzer`s.
 
 @docs eitherOr, uniformOrCrash, stringMaxLength, sequence
+
 
 ## Deprecated
 
 Do not use this. It will be deprecated in version 2.
 
 @docs union
+
 -}
 
 import Array
-import Fuzz exposing (Fuzzer, andThen, map)
-import Random.Pcg as Random exposing (Generator)
+import Fuzz exposing (Fuzzer, andMap, map)
+import Random exposing (Generator)
 import Shrink exposing (Shrinker)
 import Util exposing (..)
 
@@ -25,17 +30,11 @@ import Util exposing (..)
         Fuzz.Extra.eitherOr
             (Fuzz.constant Nothing)
             (Fuzz.int |> Fuzz.map Just)
+
 -}
 eitherOr : Fuzzer a -> Fuzzer a -> Fuzzer a
 eitherOr a b =
-    Fuzz.bool
-        |> andThen
-            (\x ->
-                if x then
-                    a
-                else
-                    b
-            )
+    Fuzz.oneOf [ a, b ]
 
 
 {-| Generates among the provided values with uniform distribution
@@ -51,6 +50,7 @@ Like `Fuzz.frequencyOrCrash` but with uniform distribution.
 Same as for `frequencyOrCrash`: "This is useful in tests, where a crash will
 simply cause the test run to fail. There is no danger to a production system
 there."
+
 -}
 uniformOrCrash : List (Fuzzer a) -> Fuzzer a
 uniformOrCrash list =
@@ -86,7 +86,8 @@ sequence fuzzers =
 
 {-| Create a fuzzer for a union type.
 
-__Deprecated__: use `uniformOrCrash`
+**Deprecated**: use `uniformOrCrash`
+
 -}
 union : List a -> a -> Shrinker a -> Fuzzer a
 union list default shrinker =
@@ -94,16 +95,14 @@ union list default shrinker =
         (let
             array =
                 Array.fromList list
-
-            index =
-                (Array.length array) - 1
          in
-            index
-                |> Random.int 0
-                |> Random.map
-                    (\index ->
-                        Array.get index array
-                            |> Maybe.withDefault default
-                    )
+         Array.length array
+            - 1
+            |> Random.int 0
+            |> Random.map
+                (\index ->
+                    Array.get index array
+                        |> Maybe.withDefault default
+                )
         )
         shrinker

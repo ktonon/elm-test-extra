@@ -1,26 +1,25 @@
-module Expect.Extra
-    exposing
-        ( MatchPattern
-        , contain
-        , match
-        , member
-        , regexPattern
-        , stringPattern
-        )
+module Expect.Extra exposing
+    ( match, MatchPattern, stringPattern, regexPattern
+    , contain, member
+    )
 
 {-| Extends `Expect` with more `Expectation`s.
+
 
 ## Strings
 
 @docs match, MatchPattern, stringPattern, regexPattern
 
+
 ## Lists
 
 @docs contain, member
+
 -}
 
+import Debug
 import Expect exposing (..)
-import Regex exposing (Regex)
+import Regex
 
 
 {-| An expectation represented as a pattern to match a string.
@@ -61,8 +60,13 @@ match expected actual =
                 String.contains pattern actual
 
         RegexPattern pattern ->
-            Expect.true ("\"" ++ actual ++ "\" to match regex: " ++ pattern) <|
-                Regex.contains (Regex.regex pattern) actual
+            case Regex.fromString pattern of
+                Just regex ->
+                    Expect.true ("\"" ++ actual ++ "\" to match regex: " ++ pattern) <|
+                        Regex.contains regex actual
+
+                Nothing ->
+                    Expect.fail <| "Bad pattern given to Expect.Extra.match: " ++ pattern
 
 
 {-| Passes if value is a member of list.
@@ -70,17 +74,19 @@ match expected actual =
     member 1 [0, 1, 2]
 
     -- Passes because 1 is a member of [0, 1, 2]
+
 -}
 member : a -> List a -> Expectation
 member value list =
     if List.member value list then
         pass
+
     else
         fail
             ("Expected:\n  "
-                ++ (toString list)
+                ++ Debug.toString list
                 ++ "\nto contain:\n  "
-                ++ (toString value)
+                ++ Debug.toString value
             )
 
 
@@ -91,6 +97,7 @@ Reads better with bdd style tests.
     expect [0, 1, 2] to contain 1
 
     -- Passes because [0, 1, 2] contains 1
+
 -}
 contain : a -> List a -> Expectation
 contain =

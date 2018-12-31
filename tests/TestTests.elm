@@ -1,4 +1,4 @@
-module TestTests exposing (..)
+module TestTests exposing (all)
 
 import Json.Decode
 import Test exposing (..)
@@ -11,7 +11,7 @@ all =
         [ describe "testDecoder"
             [ testDecoder Json.Decode.int
                 ( "\"foo\""
-                , FailsToDecodeWith "Expecting an Int but instead got: \"foo\""
+                , FailsToDecodeWith "Problem with the given value:\n\n\"foo\"\n\nExpecting an INT"
                 )
             , testDecoder
                 Json.Decode.string
@@ -24,7 +24,7 @@ all =
                 , ( "\"foo\"", FailsToDecode )
                 , ( "1", DecodesTo 1 )
                 , ( "1.5", FailsToDecode )
-                , ( "1.5", FailsToDecodeWith "Expecting an Int but instead got: 1.5" )
+                , ( "1.5", FailsToDecodeWith "Problem with the given value:\n\n1.5\n\nExpecting an INT" )
                 ]
             ]
         ]
