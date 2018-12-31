@@ -2,13 +2,16 @@ module Test.Extra exposing (DecoderExpectation(..), describeDecoder, testDecoder
 
 {-| Extends `Test` with specialized test and describe function.
 
+
 ## Describing JSON Decoders
 
 Write concise test for JSON decoders
 
 @docs DecoderExpectation, describeDecoder, testDecoder
+
 -}
 
+import Debug
 import Expect
 import Json.Decode exposing (decodeString)
 import Test exposing (..)
@@ -16,9 +19,10 @@ import Test exposing (..)
 
 {-| Expectation for a decoder result.
 
-* `FailsToDecode` - expect the decoder to fail, the failure message can be anything
-* `FailsToDecodeWith String` - expect the decoder to fail with a specific message
-* `DecodesTo a` - expect the decoder to succeed, decoding to the provided value
+  - `FailsToDecode` - expect the decoder to fail, the failure message can be anything
+  - `FailsToDecodeWith String` - expect the decoder to fail with a specific message
+  - `DecodesTo a` - expect the decoder to succeed, decoding to the provided value
+
 -}
 type DecoderExpectation a
     = FailsToDecode
@@ -30,15 +34,14 @@ type DecoderExpectation a
 
 For example
 
-```elm
-describeDecoder "int"
-  Json.Decode.int
-  [ ( "", FailsToDecode )
-  , ( "foo", FailsToDecode )
-  , ( "1", DecodesTo 1 )
-  , ( "1.5", FailsToDecode )
-  ]
-```
+    describeDecoder "int"
+        Json.Decode.int
+        [ ( "", FailsToDecode )
+        , ( "foo", FailsToDecode )
+        , ( "1", DecodesTo 1 )
+        , ( "1.5", FailsToDecode )
+        ]
+
 -}
 describeDecoder : String -> Json.Decode.Decoder a -> List ( String, DecoderExpectation a ) -> Test
 describeDecoder label decoder cases =
@@ -51,11 +54,10 @@ describeDecoder label decoder cases =
 
 For example
 
-```elm
-testDecoder Json.Decode.string
-  "\"foo\""
-  (DecodesTo "foo")
-```
+    testDecoder Json.Decode.string
+        "\"foo\""
+        (DecodesTo "foo")
+
 -}
 testDecoder : Json.Decode.Decoder a -> ( String, DecoderExpectation a ) -> Test
 testDecoder decoder ( input, expectation ) =
@@ -63,12 +65,13 @@ testDecoder decoder ( input, expectation ) =
         \() ->
             input
                 |> decodeString decoder
+                |> Result.mapError Json.Decode.errorToString
                 |> decoderExpectation input expectation
 
 
 testDecoderLabel : String -> DecoderExpectation a -> String
 testDecoderLabel input de =
-    input ++ " " ++ (de |> toString)
+    input ++ " " ++ (de |> Debug.toString)
 
 
 decoderExpectation : String -> DecoderExpectation a -> Result String a -> Expect.Expectation
@@ -90,6 +93,7 @@ decoderExpectation input de result =
                 Err actualError ->
                     if actualError /= exp then
                         expectedMsg input exp actualError
+
                     else
                         Expect.pass
 
@@ -98,6 +102,7 @@ decoderExpectation input de result =
                 Ok actual ->
                     if actual == exp then
                         Expect.pass
+
                     else
                         expectedValue input exp actual
 
@@ -111,7 +116,7 @@ expectedFail input actual =
         ("Expected input:\n  "
             ++ input
             ++ "\nto fail to decoded, but it decoded to:\n  "
-            ++ (toString actual)
+            ++ Debug.toString actual
         )
 
 
@@ -143,7 +148,7 @@ expectedValue input expected actual =
         ("Expected input:\n  "
             ++ input
             ++ "\nto decode to:\n  "
-            ++ (toString expected)
+            ++ Debug.toString expected
             ++ "\nbut instead got decoded value:\n  "
-            ++ (toString actual)
+            ++ Debug.toString actual
         )

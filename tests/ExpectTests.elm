@@ -1,8 +1,8 @@
-module ExpectTests exposing (..)
+module ExpectTests exposing (all)
 
-import Test exposing (..)
 import Expect
 import Expect.Extra exposing (..)
+import Test exposing (..)
 
 
 all : Test
@@ -12,22 +12,22 @@ all =
             [ test "passes if actual equals pattern" <|
                 \_ ->
                     Expect.equal
-                        (Expect.pass)
+                        Expect.pass
                         (match (stringPattern "foo") "foo")
             , test "passes if actual begins with pattern" <|
                 \_ ->
                     Expect.equal
-                        (Expect.pass)
+                        Expect.pass
                         (match (stringPattern "foo") "foobar")
             , test "passes if actual ends with pattern" <|
                 \_ ->
                     Expect.equal
-                        (Expect.pass)
+                        Expect.pass
                         (match (stringPattern "bar") "foobar")
             , test "passes if actual contains pattern" <|
                 \_ ->
                     Expect.equal
-                        (Expect.pass)
+                        Expect.pass
                         (match (stringPattern "bar") "foobarcar")
             , test "fails if actual does not contain pattern" <|
                 \_ ->
@@ -44,7 +44,7 @@ all =
             [ test "passes with full match" <|
                 \_ ->
                     Expect.equal
-                        (Expect.pass)
+                        Expect.pass
                         (match (regexPattern "^foo$") "foo")
             , test "fails with full match" <|
                 \_ ->
@@ -59,7 +59,12 @@ all =
             , test "passes with regular expression match" <|
                 \_ ->
                     Expect.equal
-                        (Expect.pass)
+                        Expect.pass
                         (match (regexPattern "foo\\s+bar") "foo    \t  bar")
+            , test "fails if the pattern is not a regular expression" <|
+                \_ ->
+                    Expect.equal
+                        (Expect.fail "Bad pattern given to Expect.Extra.match: [z")
+                        (match (regexPattern "[z") "foo")
             ]
         ]
