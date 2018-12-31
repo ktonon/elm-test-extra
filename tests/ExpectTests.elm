@@ -67,4 +67,16 @@ all =
                         (Expect.fail "Bad pattern given to Expect.Extra.match: [z")
                         (match (regexPattern "[z") "foo")
             ]
+        , describe "member" <|
+            [ test "value in list" <|
+                \_ ->
+                    Expect.equal
+                        Expect.pass
+                        (member Debug.toString 3 [ 1, 2, 3 ])
+            , test "value not in list" <|
+                \_ ->
+                    Expect.equal
+                        (Expect.fail "Expected:\n  [1, 2, 3]\nto contain:\n  4")
+                        (member Debug.toString 4 [ 1, 2, 3 ])
+            ]
         ]

@@ -11,7 +11,6 @@ Write concise test for JSON decoders
 
 -}
 
-import Debug
 import Expect
 import Json.Decode exposing (decodeString)
 import Test exposing (..)
@@ -36,6 +35,7 @@ For example
 
     describeDecoder "int"
         Json.Decode.int
+        Debug.toString
         [ ( "", FailsToDecode )
         , ( "foo", FailsToDecode )
         , ( "1", DecodesTo 1 )
@@ -43,10 +43,15 @@ For example
         ]
 
 -}
-describeDecoder : String -> Json.Decode.Decoder a -> List ( String, DecoderExpectation a ) -> Test
-describeDecoder label decoder cases =
+describeDecoder :
+    String
+    -> Json.Decode.Decoder a
+    -> (a -> String)
+    -> List ( String, DecoderExpectation a )
+    -> Test
+describeDecoder label decoder toString cases =
     cases
-        |> List.map (testDecoder decoder)
+        |> List.map (testDecoder decoder toString)
         |> describe label
 
 
@@ -55,32 +60,43 @@ describeDecoder label decoder cases =
 For example
 
     testDecoder Json.Decode.string
-        "\"foo\""
-        (DecodesTo "foo")
+        Debug.toString
+        ( "\"foo\"", DecodesTo "foo" )
 
 -}
-testDecoder : Json.Decode.Decoder a -> ( String, DecoderExpectation a ) -> Test
-testDecoder decoder ( input, expectation ) =
-    test (testDecoderLabel input expectation) <|
+testDecoder : Json.Decode.Decoder a -> (a -> String) -> ( String, DecoderExpectation a ) -> Test
+testDecoder decoder toString ( input, expectation ) =
+    test (testDecoderLabel toString input expectation) <|
         \() ->
             input
                 |> decodeString decoder
                 |> Result.mapError Json.Decode.errorToString
-                |> decoderExpectation input expectation
+                |> decoderExpectation toString input expectation
 
 
-testDecoderLabel : String -> DecoderExpectation a -> String
-testDecoderLabel input de =
-    input ++ " " ++ (de |> Debug.toString)
+testDecoderLabel : (a -> String) -> String -> DecoderExpectation a -> String
+testDecoderLabel toString input de =
+    input
+        ++ " "
+        ++ (case de of
+                FailsToDecode ->
+                    "FailsToDecode"
+
+                FailsToDecodeWith val ->
+                    "FailsToDecodeWith " ++ val
+
+                DecodesTo val ->
+                    "DecodesTo " ++ toString val
+           )
 
 
-decoderExpectation : String -> DecoderExpectation a -> Result String a -> Expect.Expectation
-decoderExpectation input de result =
+decoderExpectation : (a -> String) -> String -> DecoderExpectation a -> Result String a -> Expect.Expectation
+decoderExpectation toString input de result =
     case de of
         FailsToDecode ->
             case result of
                 Ok actual ->
-                    expectedFail input actual
+                    expectedFail toString input actual
 
                 Err _ ->
                     Expect.pass
@@ -88,7 +104,7 @@ decoderExpectation input de result =
         FailsToDecodeWith exp ->
             case result of
                 Ok actual ->
-                    expectedFail input actual
+                    expectedFail toString input actual
 
                 Err actualError ->
                     if actualError /= exp then
@@ -104,19 +120,19 @@ decoderExpectation input de result =
                         Expect.pass
 
                     else
-                        expectedValue input exp actual
+                        expectedValue toString input exp actual
 
                 Err err ->
                     expectedDecode input err
 
 
-expectedFail : String -> a -> Expect.Expectation
-expectedFail input actual =
+expectedFail : (a -> String) -> String -> a -> Expect.Expectation
+expectedFail toString input actual =
     Expect.fail
         ("Expected input:\n  "
             ++ input
             ++ "\nto fail to decoded, but it decoded to:\n  "
-            ++ Debug.toString actual
+            ++ toString actual
         )
 
 
@@ -142,13 +158,13 @@ expectedDecode input errorMessage =
         )
 
 
-expectedValue : String -> a -> a -> Expect.Expectation
-expectedValue input expected actual =
+expectedValue : (a -> String) -> String -> a -> a -> Expect.Expectation
+expectedValue toString input expected actual =
     Expect.fail
         ("Expected input:\n  "
             ++ input
             ++ "\nto decode to:\n  "
-            ++ Debug.toString expected
+            ++ toString expected
             ++ "\nbut instead got decoded value:\n  "
-            ++ Debug.toString actual
+            ++ toString actual
         )

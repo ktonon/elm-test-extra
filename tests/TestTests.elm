@@ -10,16 +10,18 @@ all =
     describe "Test.Extra"
         [ describe "testDecoder"
             [ testDecoder Json.Decode.int
+                Debug.toString
                 ( "\"foo\""
                 , FailsToDecodeWith "Problem with the given value:\n\n\"foo\"\n\nExpecting an INT"
                 )
-            , testDecoder
-                Json.Decode.string
+            , testDecoder Json.Decode.string
+                Debug.toString
                 ( "\"foo\"", DecodesTo "foo" )
             ]
         , describe "describeDecoder"
             [ describeDecoder "int"
                 Json.Decode.int
+                Debug.toString
                 [ ( "", FailsToDecode )
                 , ( "\"foo\"", FailsToDecode )
                 , ( "1", DecodesTo 1 )

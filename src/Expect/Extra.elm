@@ -17,7 +17,6 @@ module Expect.Extra exposing
 
 -}
 
-import Debug
 import Expect exposing (..)
 import Regex
 
@@ -76,17 +75,18 @@ match expected actual =
     -- Passes because 1 is a member of [0, 1, 2]
 
 -}
-member : a -> List a -> Expectation
-member value list =
+member : (a -> String) -> a -> List a -> Expectation
+member toString value list =
     if List.member value list then
         pass
 
     else
         fail
             ("Expected:\n  "
-                ++ Debug.toString list
-                ++ "\nto contain:\n  "
-                ++ Debug.toString value
+                ++ "["
+                ++ (List.map toString list |> String.join ", ")
+                ++ "]\nto contain:\n  "
+                ++ toString value
             )
 
 
@@ -99,6 +99,6 @@ Reads better with bdd style tests.
     -- Passes because [0, 1, 2] contains 1
 
 -}
-contain : a -> List a -> Expectation
-contain =
-    member
+contain : a -> (a -> String) -> List a -> Expectation
+contain value toString =
+    member toString value
