@@ -79,4 +79,33 @@ all =
                         (Expect.fail "Expected:\n  [1, 2, 3]\nto contain:\n  4")
                         (member Debug.toString 4 [ 1, 2, 3 ])
             ]
+        , describe "just" <|
+            [ test "matching Just" <|
+                \_ ->
+                    Expect.equal
+                        Expect.pass
+                        (just (Expect.equal "foo") (Just "foo"))
+            , test "non-matching Just" <|
+                \_ ->
+                    Expect.equal
+                        (Expect.equal "foo" "bar")
+                        (just (Expect.equal "foo") (Just "bar"))
+            , test "Nothing" <|
+                \_ ->
+                    Expect.equal
+                        (Expect.fail "Expected a Just but got Nothing")
+                        (just (Expect.equal "foo") Nothing)
+            ]
+        , describe "exactly" <|
+            [ test "equal" <|
+                \_ ->
+                    Expect.equal
+                        Expect.pass
+                        (exactly 1.0 1.0)
+            , test "not equal" <|
+                \_ ->
+                    Expect.equal
+                        (Expect.within (Expect.Absolute 0) 1.0 1.0001)
+                        (exactly 1.0 1.0001)
+            ]
         ]
