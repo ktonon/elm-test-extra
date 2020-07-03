@@ -16,4 +16,9 @@ all =
                 \w ->
                     Expect.lessThan 11 (w |> String.length)
             ]
+        , describe "sequence"
+            [ fuzz (Fuzz.Extra.sequence <| List.map Fuzz.constant [ "::first::", "::second::", "::third::" ]) "the sequence of fuzzers respects the sequence of inputs" <|
+                \items ->
+                    Expect.equal [ "::first::", "::second::", "::third::" ] items
+            ]
         ]
